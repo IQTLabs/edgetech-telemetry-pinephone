@@ -1,22 +1,18 @@
 version: "3"
 services:
-  mqtt-broker:
-    image: eclipse-mosquitto
+  mqtt:
+    image: iqtlabs/edgetech-mqtt:latest
     ports:
-      - "8883:8883"
+      - "1883:1883"
       - "9001:9001"
-    volumes:
-      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    restart: unless-stopped
+
   telemetry:
-    image: telemetryimage
-    restart: always
+    image: iqtlabs/edgetech-core:latest
+    #restart: always
     network_mode: "host"
     depends_on: 
-      - mqtt-broker
-    volumes:
-      - type: bind
-        source: ./config
-        target: /root/config
+      - mqtt
     build:
       context: ./
       dockerfile: ./Dockerfile

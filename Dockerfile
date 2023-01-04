@@ -1,11 +1,10 @@
-FROM python:3.11-slim
+FROM iqtlabs/edgetech-core:latest
 
 RUN pip install paho-mqtt==1.6.1
 RUN apt update
 #RUN apt install screen -y
 
 WORKDIR /root
-ADD BaseMQTTPubSub.py .
 ADD TelemetryPinephone.py .
 
 # variable passed via compose 
