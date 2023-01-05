@@ -8,13 +8,13 @@ services:
     restart: unless-stopped
 
   telemetry:
-    image: iqtlabs/edgetech-core:latest
+    image: iqtlabs/edgetech-telemetry-pinephone:latest
     #restart: always
     network_mode: "host"
     depends_on: 
       - mqtt
     build:
-      context: ./
+      context: ./telemetry-pinephone
       dockerfile: ./Dockerfile
       args:
         BASE_MQTT_PUBLISH_TOPIC: '/telemetry/pub'
