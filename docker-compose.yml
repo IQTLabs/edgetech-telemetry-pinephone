@@ -19,3 +19,5 @@ services:
       args:
         BASE_MQTT_PUBLISH_TOPIC: '/telemetry/pub'
         BASE_MQTT_SUBSCRIBE_TOPIC: '/telemetry/sub'
+    volumes:
+      - './data:/root/data'  
