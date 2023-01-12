@@ -38,5 +38,5 @@ if cmd_output!="":
 # save result json to file
 print(result)
 
-with open('data/telemetry_data.json', 'w', encoding='utf-8') as f:
+with open('sensor-data/telemetry_data.json', 'w', encoding='utf-8') as f:
     json.dump(result, f, ensure_ascii=False, indent=4)
