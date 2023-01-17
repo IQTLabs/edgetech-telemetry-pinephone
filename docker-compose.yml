@@ -9,15 +9,12 @@ services:
 
   telemetry:
     image: iqtlabs/edgetech-telemetry:latest
-    network_mode: "host"
     build:
       context: ../edgetech-telemetry-pinephone/telemetry
       dockerfile: ./Dockerfile
     environment:
-      - C2_TOPIC=/AISonobuoy/<HOSTNAME>/C2/edgetech-c2/string
       - TELEMETRY_TOPIC=/AISonobuoy/<HOSTNAME>/telemetry/telemetry/string
-      - DATA_ROOT=/sensor-data
-      - MQTT_IP=localhost
+      - MQTT_IP=mqtt
     volumes:
       - ./sensor-data:/sensor-data
     restart: unless-stopped
