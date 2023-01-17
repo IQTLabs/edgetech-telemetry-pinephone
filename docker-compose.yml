@@ -8,16 +8,15 @@ services:
     restart: unless-stopped
 
   telemetry:
-    image: iqtlabs/edgetech-telemetry-pinephone:latest
-    #restart: always
-    network_mode: "host"
+    image: iqtlabs/edgetech-telemetry:latest
+    build:
+      context: ../edgetech-telemetry-pinephone/telemetry
+      dockerfile: ./Dockerfile
+    environment:
+      - TELEMETRY_TOPIC=/AISonobuoy/<HOSTNAME>/telemetry/telemetry/string
+      - MQTT_IP=mqtt
+    volumes:
+      - ./sensor-data:/sensor-data
+    restart: unless-stopped
     depends_on: 
       - mqtt
-    build:
-      context: ./telemetry-pinephone
-      dockerfile: ./Dockerfile
-      args:
-        BASE_MQTT_PUBLISH_TOPIC: '/telemetry/pub'
-        BASE_MQTT_SUBSCRIBE_TOPIC: '/telemetry/sub'
-    volumes:
-      - './data:/root/data'  
