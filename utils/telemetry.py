@@ -1,11 +1,16 @@
 import subprocess
 import json
 import jc
+import os
+import time
 
-cmd_output = ""
 result = {}
 
-# parse battery percentage
+# add timestamp
+result["timestamp"] = int(time.time())
+
+# parse and add battery percentage
+cmd_output = ""
 try:
     cmd_output = subprocess.check_output(["upower", "-d"], stderr=subprocess.STDOUT).decode('utf-8')
 except Exception as e:
@@ -21,7 +26,8 @@ if cmd_output!="":
             if "percentage" in item['detail']:
                 result["battery_percentage"] = item['detail']["percentage"]
 
-# parse uptime
+# parse and add uptime
+cmd_output = ""
 try:
     cmd_output = subprocess.check_output(["uptime"], stderr=subprocess.STDOUT).decode('utf-8')
 except Exception as e:
@@ -35,8 +41,11 @@ if cmd_output!="":
     if "uptime_total_seconds" in json_obj:
         result["uptime_total_seconds"] = json_obj["uptime_total_seconds"]
 
-# save result json to file
+# save result to file as json
 print(result)
 
-with open('sensor-data/telemetry_data.json', 'w', encoding='utf-8') as f:
+if not os.path.isdir('/telemetry_data'):
+    os.mkdir('/telemetry_data')
+
+with open('/telemetry_data/telemetry_data.json', 'w+', encoding='utf-8') as f:
     json.dump(result, f, ensure_ascii=False, indent=4)

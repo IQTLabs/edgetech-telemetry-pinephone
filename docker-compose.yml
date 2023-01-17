@@ -16,7 +16,7 @@ services:
       - TELEMETRY_TOPIC=/AISonobuoy/<HOSTNAME>/telemetry/telemetry/string
       - MQTT_IP=mqtt
     volumes:
-      - ./sensor-data:/sensor-data
+      - /telemetry_data:/telemetry_data
     restart: unless-stopped
     depends_on: 
       - mqtt
