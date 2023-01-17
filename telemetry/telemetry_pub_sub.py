@@ -4,7 +4,7 @@ import json
 from typing import Any, Dict
 import schedule
 from datetime import datetime
-import paho.mqtt as mqtt
+import paho.mqtt.client as mqtt
 
 from base_mqtt_pub_sub import BaseMQTTPubSub
 
@@ -32,7 +32,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         self.publish_registration("Telemetry Module Registration")
 
     def c2_sub_topic_callback(
-        self: Any, _client: mqtt.client, _userdata: Dict[Any, Any], msg: Any
+        self: Any, _client: mqtt.Client, _userdata: Dict[Any, Any], msg: Any
     ) -> None:
         # Decode message:
         # Always publishing a JSON string with {timestamp: ____, data: ____,}
