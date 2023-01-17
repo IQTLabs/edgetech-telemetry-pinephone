@@ -28,7 +28,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         self.publish_registration("Telemetry Module Registration")
 
     def publish_telemetry(self: Any) -> None:        
-        with open('/sensor-data/telemetry_data.json', "r") as f:
+        with open('/telemetry_data/telemetry_data.json', "r") as f:
             data = f.read()
             self.publish_to_topic(self.telemetry_pub_topic, data)
 
