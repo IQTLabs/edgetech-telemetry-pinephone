@@ -6,17 +6,17 @@ services:
       - "1883:1883"
       - "9001:9001"
     restart: unless-stopped
-
   telemetry:
     image: iqtlabs/edgetech-telemetry:latest
     build:
-      context: ../edgetech-telemetry-pinephone/telemetry
+      context: ./edgetech-telemetry-pinephone/telemetry
       dockerfile: ./Dockerfile
     environment:
       - TELEMETRY_TOPIC=/AISonobuoy/<HOSTNAME>/telemetry/telemetry/string
+      - TELEMETRY_FILE_PATH=/telemetry_data/telemetry_data.json
       - MQTT_IP=mqtt
     volumes:
-      - /telemetry_data:/telemetry_data
+      - /home/mobian/telemetry_data:/telemetry_data
     restart: unless-stopped
     depends_on: 
       - mqtt
