@@ -1,51 +1,48 @@
+"""
+This file collect relevant telemetry on the pinephone and writes them to a summary JSON file that
+can then be accessed my an MQTT PubSub running in a docker container as OS commands cannot be
+executed from a container.
+
+Run this file, use the following cron job (you may have to change the path to the telemetry file):
+pip3 install jc==1.22.4
+crontab -e
+* * * * * /usr/bin/python3 /home/mobian/ari_dev/edgetech-telemetry-pinephone/utils/telemetry.py
+
+This cron job runs every minute, which is the minimum cadence at which a cron job can run.
+"""
 import subprocess
 import json
-import jc
 import os
-import time
+from datetime import datetime
+import jc
 
+# instantiate output dictionary
 result = {}
 
 # add timestamp
-result["timestamp"] = int(time.time())
+result["timestamp"] = str(int(datetime.utcnow().timestamp()))
 
-# parse and add battery percentage
-cmd_output = ""
-try:
-    cmd_output = subprocess.check_output(["upower", "-d"], stderr=subprocess.STDOUT).decode('utf-8')
-except Exception as e:
-    print(e)
+# add battery power
+result["battery_percentage"] = {
+    key: val
+    for dict_ in jc.parse(
+        "upower",
+        subprocess.check_output(["upower", "-d"], stderr=subprocess.STDOUT).decode(
+            "utf-8"
+        ),
+    )
+    for key, val in dict_.items()
+}["detail"]["percentage"]
 
-if cmd_output!="":
-    jc_output = jc.parse('upower', cmd_output)
-    json_str = json.dumps(jc_output,indent=1)
-    json_obj = json.loads(json_str)
-    
-    for item in json_obj:
-        if "device_name" in item and item['device_name'] == "/org/freedesktop/UPower/devices/battery_rk818_battery":
-            if "percentage" in item['detail']:
-                result["battery_percentage"] = item['detail']["percentage"]
+# add uptime
+result["uptime_total_seconds"] = jc.parse(
+    "uptime",
+    subprocess.check_output(["uptime"], stderr=subprocess.STDOUT).decode("utf-8"),
+)["uptime_total_seconds"]
 
-# parse and add uptime
-cmd_output = ""
-try:
-    cmd_output = subprocess.check_output(["uptime"], stderr=subprocess.STDOUT).decode('utf-8')
-except Exception as e:
-    print(e)
-
-if cmd_output!="":
-    jc_output = jc.parse('uptime', cmd_output)
-    json_str = json.dumps(jc_output,indent=1)
-    json_obj = json.loads(json_str)
-    
-    if "uptime_total_seconds" in json_obj:
-        result["uptime_total_seconds"] = json_obj["uptime_total_seconds"]
-
-# save result to file as json
-print(result)
-
-if not os.path.isdir('/telemetry_data'):
-    os.mkdir('/telemetry_data')
-
-with open('/telemetry_data/telemetry_data.json', 'w+', encoding='utf-8') as f:
-    json.dump(result, f, ensure_ascii=False, indent=4)
+# save
+os.makedirs("/home/mobian/telemetry_data", exist_ok=True)
+with open(
+    "/home/mobian/telemetry_data/telemetry_data.json", "w+", encoding="utf-8"
+) as f_pointer:
+    json.dump(result, f_pointer, ensure_ascii=False, indent=4)
