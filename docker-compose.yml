@@ -13,10 +13,12 @@ services:
       dockerfile: ./Dockerfile
     environment:
       - TELEMETRY_TOPIC=/AISonobuoy/<HOSTNAME>/telemetry/telemetry/string
-      - TELEMETRY_FILE_PATH=/telemetry_data/telemetry_data.json
+      - BATTERY_CAPACITY_FILE_PATH=/root/battery_capacity
+      - UPTIME_FILE_PATH=/root/uptime
       - MQTT_IP=mqtt
     volumes:
-      - /home/mobian/telemetry_data:/telemetry_data
+      - /sys/class/power_supply/rk818-battery/capacity:/root/battery_capacity
+      - /proc/uptime:/root/uptime
     restart: unless-stopped
     depends_on: 
       - mqtt

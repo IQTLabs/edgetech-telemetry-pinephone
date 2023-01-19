@@ -1,12 +1,12 @@
 # edgetech-telemetry-pinephone
 EdgeTech Telemetry module for the PinePhone
 
-Read telemetry JSON string from Docker bind mount and publish on the telemetry topic.
+Telemetry data is read from sensor files that are mapped to the Docker container in `docker-compose.yml` and published to on the telemetry MQTT topic.
 
-## Prerequisits
-- Cron job to aggregate PinePhone telemetry in a file on the host OS. Cron job can be created with the following command:
+Current telemetry data being utilized:
 ```
-cat <(sudo crontab -l) <(echo "* * * * * /usr/bin/python3 /home/mobian/edgetech-telemetry-pinephone/utils/telemetry.py") | sudo crontab -
+battery capacity    :   /sys/class/power_supply/rk818-battery/capacity
+uptime              :   /proc/uptime
 ```
 
 ## Run

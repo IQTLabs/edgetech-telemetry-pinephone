@@ -4,8 +4,10 @@ PinePhone and publishes that data to the MQTT broker.
 """
 import os
 from time import sleep
+from datetime import datetime
 from typing import Any
 import schedule
+import json
 
 from base_mqtt_pub_sub import BaseMQTTPubSub
 
@@ -21,22 +23,25 @@ class TelemetryPubSub(BaseMQTTPubSub):
     def __init__(
         self: Any,
         telemetry_pub_topic: str,
-        telemetry_file_path: str,
-        debug: bool = False,
+        battery_capacity_file_path: str,
+        uptime_file_path: str,
+        debug: bool = True,
         **kwargs: Any,
     ):
-        """The TelemetryPubSub constructor takes a topic to publish data to and a file path to
-        read telemetry data from and sends that data to the MQTT client.
+        """The TelemetryPubSub constructor takes a topic to publish data to and files to read
+        telemetry from.
 
         Args:
             telemetry_pub_topic (str): MQTT topic to publish the telemetry data to.
-            telemetry_file_path (str): Path to the telemtry JSON saved by the cron job.
+            battery_capacity_file_path (str): Path to the PinePhone battery capacity file (i.e. /sys/class/power_supply/rk818-battery/capacity)
+            battery_capacity_file_path (str): Path to the PinePhone uptime file (i.e. /proc/uptime)
             debug (bool, optional): If the debug mode is turned on, log statements print to stdout.
         """
         # Pass enviornment variables as parameters (include **kwargs) in super().__init__()
         super().__init__(**kwargs)
         self.telemetry_pub_topic = telemetry_pub_topic
-        self.telemetry_file_path = telemetry_file_path
+        self.battery_capacity_file_path = battery_capacity_file_path
+        self.uptime_file_path = uptime_file_path
         # include debug version
         self.debug = debug
 
@@ -48,11 +53,30 @@ class TelemetryPubSub(BaseMQTTPubSub):
     def _publish_telemetry(self: Any) -> None:
         """Leverages edgetech-core functionality to publish a JSON payload to the MQTT
         broker on the topic specified in the class constructor after opening and reading
-        the telemetry file.
+        the telemetry file(s).
         """
-        with open(self.telemetry_file_path, "r", encoding="utf-8") as f_pointer:
+
+        # instantiate output dictionary
+        result = {}
+
+        # add timestamp
+        result["timestamp"] = str(int(datetime.utcnow().timestamp()))
+        
+        # add battery power
+        with open(self.battery_capacity_file_path, "r", encoding="utf-8") as f_pointer:
             data = f_pointer.read()
-            self.publish_to_topic(self.telemetry_pub_topic, data)
+            result["battery_percentage"] = data.strip()
+
+        # add uptime
+        with open(self.uptime_file_path, "r", encoding="utf-8") as f_pointer:
+            data = f_pointer.read()
+            result["uptime_total_seconds"] = data.split(" ")[0]
+        
+        if self.debug:
+            print(result)
+        
+        # publish JSON 'result' to MQTT topic
+        self.publish_to_topic(self.telemetry_pub_topic, json.dumps(result))
 
     def main(self: Any) -> None:
         """Main loop and function that setup the heartbeat to keep the TCP/IP
@@ -64,7 +88,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         )
 
         # send the payload to MQTT
-        schedule.every(1).minutes.do(self._publish_telemetry)
+        schedule.every(1).minute.do(self._publish_telemetry)
 
         while True:
             try:
@@ -80,7 +104,8 @@ class TelemetryPubSub(BaseMQTTPubSub):
 if __name__ == "__main__":
     telemetry = TelemetryPubSub(
         telemetry_pub_topic=str(os.environ.get("TELEMETRY_TOPIC")),
-        telemetry_file_path=str(os.environ.get("TELEMETRY_FILE_PATH")),
+        battery_capacity_file_path=str(os.environ.get("BATTERY_CAPACITY_FILE_PATH")),
+        uptime_file_path=str(os.environ.get("UPTIME_FILE_PATH")),
         mqtt_ip=os.environ.get("MQTT_IP"),
     )
     telemetry.main()
