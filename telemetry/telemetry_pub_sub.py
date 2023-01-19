@@ -6,8 +6,8 @@ import os
 from time import sleep
 from datetime import datetime
 from typing import Any
-import schedule
 import json
+import schedule
 
 from base_mqtt_pub_sub import BaseMQTTPubSub
 
