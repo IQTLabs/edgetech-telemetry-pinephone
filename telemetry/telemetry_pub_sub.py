@@ -61,7 +61,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
 
         # add timestamp
         result["timestamp"] = str(int(datetime.utcnow().timestamp()))
-        
+
         # add battery power
         with open(self.battery_capacity_file_path, "r", encoding="utf-8") as f_pointer:
             data = f_pointer.read()
@@ -71,10 +71,10 @@ class TelemetryPubSub(BaseMQTTPubSub):
         with open(self.uptime_file_path, "r", encoding="utf-8") as f_pointer:
             data = f_pointer.read()
             result["uptime_total_seconds"] = data.split(" ")[0]
-        
+
         if self.debug:
             print(result)
-        
+
         # publish JSON 'result' to MQTT topic
         self.publish_to_topic(self.telemetry_pub_topic, json.dumps(result))
 
