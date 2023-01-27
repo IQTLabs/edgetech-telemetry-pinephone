@@ -6,8 +6,8 @@ import os
 from time import sleep
 from datetime import datetime
 from typing import Any
-import schedule
 import json
+import schedule
 
 from base_mqtt_pub_sub import BaseMQTTPubSub
 
@@ -61,7 +61,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
 
         # add timestamp
         result["timestamp"] = str(int(datetime.utcnow().timestamp()))
-        
+
         # add battery power
         with open(self.battery_capacity_file_path, "r", encoding="utf-8") as f_pointer:
             data = f_pointer.read()
@@ -71,12 +71,25 @@ class TelemetryPubSub(BaseMQTTPubSub):
         with open(self.uptime_file_path, "r", encoding="utf-8") as f_pointer:
             data = f_pointer.read()
             result["uptime_total_seconds"] = data.split(" ")[0]
-        
+
         if self.debug:
             print(result)
-        
+
         # publish JSON 'result' to MQTT topic
-        self.publish_to_topic(self.telemetry_pub_topic, json.dumps(result))
+        out_json = self.generate_payload_json(
+            push_timestamp=str(int(datetime.utcnow().timestamp())),
+            device_type="Collector",
+            id_="TEST",
+            deployment_id=f"AISonobuoy-Arlington-{'TEST'}",
+            current_location="-90, -180",
+            status="Debug",
+            message_type="Event",
+            model_version="null",
+            firmware_version="v0.0.0",
+            data_payload_type="Telemetry",
+            data_payload=json.dumps(result),
+        )
+        self.publish_to_topic(self.telemetry_pub_topic, out_json)
 
     def main(self: Any) -> None:
         """Main loop and function that setup the heartbeat to keep the TCP/IP
