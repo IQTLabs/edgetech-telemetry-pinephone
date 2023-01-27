@@ -89,7 +89,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
             data_payload_type="Telemetry",
             data_payload=json.dumps(result),
         )
-        self.publish_to_topic(self.telemetry_pub_topic, json.dumps(out_json))
+        self.publish_to_topic(self.telemetry_pub_topic, out_json)
 
     def main(self: Any) -> None:
         """Main loop and function that setup the heartbeat to keep the TCP/IP
