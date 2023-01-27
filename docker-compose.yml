@@ -11,14 +11,11 @@ services:
     build:
       context: ./edgetech-telemetry-pinephone/telemetry
       dockerfile: ./Dockerfile
-    environment:
-      - TELEMETRY_TOPIC=/AISonobuoy/<HOSTNAME>/telemetry/telemetry/string
-      - BATTERY_CAPACITY_FILE_PATH=/root/battery_capacity
-      - UPTIME_FILE_PATH=/root/uptime
-      - MQTT_IP=mqtt
     volumes:
-      - /sys/class/power_supply/rk818-battery/capacity:/root/battery_capacity
-      - /proc/uptime:/root/uptime
+      - /sys/class/power_supply/rk818-battery/capacity:/battery_capacity
+      - /proc/uptime:/uptime
     restart: unless-stopped
     depends_on: 
       - mqtt
+    env_file:
+      - .env
