@@ -50,10 +50,10 @@
 
 Current telemetry data being utilized:
 
-    ```
-    battery capacity    :   /sys/class/power_supply/rk818-battery/capacity
-    uptime              :   /proc/uptime
-    ```
+```
+battery capacity    :   /sys/class/power_supply/rk818-battery/capacity
+uptime              :   /proc/uptime
+```
     
 
 ### Built With
