@@ -89,6 +89,11 @@ flowchart TD
     mqtt{MQTT} -- Subscribed to Telemetry Topic --> filesaver(Filesaver)
     mqtt{MQTT} -- Subscribed to Telemetry Topic -->  couchdbsaver(CouchDB Saver)
 
+style mqtt fill:#0072bc,color:#ffffff
+style telemetry fill:#80c342,color:#ffffff
+style couchdbsaver fill:#F9D308,color:#ffffff
+style filesaver fill:#F9D308,color:#ffffff
+
 ```
 
 ## Roadmap
