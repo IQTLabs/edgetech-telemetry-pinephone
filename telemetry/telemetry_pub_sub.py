@@ -33,7 +33,8 @@ class TelemetryPubSub(BaseMQTTPubSub):
 
         Args:
             telemetry_pub_topic (str): MQTT topic to publish the telemetry data to.
-            battery_capacity_file_path (str): Path to the PinePhone battery capacity file (i.e. /sys/class/power_supply/rk818-battery/capacity)
+            battery_capacity_file_path (str): Path to the PinePhone battery capacity
+            file (i.e. /sys/class/power_supply/rk818-battery/capacity)
             battery_capacity_file_path (str): Path to the PinePhone uptime file (i.e. /proc/uptime)
             debug (bool, optional): If the debug mode is turned on, log statements print to stdout.
         """
@@ -109,9 +110,9 @@ class TelemetryPubSub(BaseMQTTPubSub):
                 # include a sleep so loop does not run at CPU time
                 sleep(0.001)
 
-            except Exception as e:
+            except KeyboardInterrupt as exception:
                 if self.debug:
-                    print(e)
+                    print(exception)
 
 
 if __name__ == "__main__":
