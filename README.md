@@ -78,7 +78,7 @@ Running this repo requires that you have [Docker](https://www.docker.com) instal
 
 ## Usage
 
-Spinning up this system requires an MQTT server and this container to be included in your `docker-compose.yml`. You can find an example of this workflow in this repository's `docker-compose.yml`. Additionally, some editing of relevant enviornment variables will be required based upon your system's configuration of topics to subscribe to and MQTT configuration. Examples of these enviornment variables can be found in this repository's `.env` file. 
+Spinning up this system requires an MQTT server and this container to be included in your `docker-compose.yml`. You can find an example of this workflow in this repository's `docker-compose.yml`. Additionally, some editing of relevant environment variables will be required based upon your system's configuration of topics to subscribe to and MQTT configuration. Examples of these environment variables can be found in this repository's `.env` file. 
 
 As this system is meant to be spun up with MQTT topics you would like to write to files, copying the telemetry `docker-compose` statements into a master `docker-compose.yml` and  `.env` files with your entire system of containers is the preferred workflow. Find an application architecture diagram example of how the usage of this module was envisioned below.
 
@@ -124,7 +124,7 @@ See `CONTRIBUTING.md` for more information.
 
 ## License
 
-Distributed under the [Apache 2.0](https://github.com/IQTLabs/edgetech-telemetry-pinephone/blob/main/LICENSE). See `LICENSE.txt` for more information.
+Distributed under the [Apache 2.0](https://github.com/IQTLabs/edgetech-telemetry-pinephone/blob/main/LICENSE). See `LICENSE` for more information.
 
 ## Contact IQTLabs
 
