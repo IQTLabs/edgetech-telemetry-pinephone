@@ -38,7 +38,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
             battery_capacity_file_path (str): Path to the PinePhone uptime file (i.e. /proc/uptime)
             debug (bool, optional): If the debug mode is turned on, log statements print to stdout.
         """
-        # Pass enviornment variables as parameters (include **kwargs) in super().__init__()
+        # Pass environment variables as parameters (include **kwargs) in super().__init__()
         super().__init__(**kwargs)
         self.telemetry_pub_topic = telemetry_pub_topic
         self.battery_capacity_file_path = battery_capacity_file_path
