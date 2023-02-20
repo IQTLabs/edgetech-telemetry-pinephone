@@ -2,7 +2,7 @@
 name = "telemetry"
 version = "0.1.0"
 description = "MQTT client to pull basic telemetry from the Pinephone running mobian and publish that to a topic"
-authors = ["Ari <ari.chadda@gmail.com>"]
+authors = ["Ari <achadda@iqt.org>", "Rob <rcaudill@iqt.org>", "Logan <lkunka@iqt.org>", "Mona <mgogia@iqt.org>", "Jon <jmeade@iqt.org>", "Mike <mchadwick@iqt.org>"]
 license = "Apache 2.0"
 
 [tool.poetry.dependencies]
