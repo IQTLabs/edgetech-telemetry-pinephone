@@ -34,7 +34,7 @@
 <h1 align="center">EdgeTech-Telemetry-Pinephone</h1>
 
   <p align="center">
-    This repo builds upon the <a href="https://github.com/IQTLabs/edgetech-core">IQT Labs EdgeTech-Core</a> functionality to instantiate an <a href="https://projects.eclipse.org/projects/iot.mosquitto">MQTT</a> client that publishes telemetry information to the MQTT bus from the PinePhone running `mobian`. Telemetry data is read from sensor files that are mapped to the Docker container in `docker-compose.yml` via volumes and published to on the telemetry MQTT topic. 
+    This repo builds upon the <a href="https://github.com/IQTLabs/edgetech-core">IQT Labs EdgeTech-Core</a> functionality to instantiate an <a href="https://projects.eclipse.org/projects/iot.mosquitto">MQTT</a> client that publishes telemetry information to the MQTT bus from the PinePhone running mobian. Telemetry data is read from sensor files that are mapped to the Docker container in docker-compose.yml via volumes and published to on the telemetry MQTT topic. 
     <br/>
     <br/>
     <a href="https://github.com/IQTLabs/edgetech-telemetry-pinephone/pulls">Make Contribution</a>
