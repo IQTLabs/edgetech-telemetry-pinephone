@@ -25,6 +25,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         telemetry_pub_topic: str,
         battery_capacity_file_path: str,
         uptime_file_path: str,
+        hostname: str,
         debug: bool = False,
         **kwargs: Any,
     ):
@@ -43,6 +44,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         self.telemetry_pub_topic = telemetry_pub_topic
         self.battery_capacity_file_path = battery_capacity_file_path
         self.uptime_file_path = uptime_file_path
+        self.hostname = hostname
         # include debug version
         self.debug = debug
 
@@ -80,8 +82,8 @@ class TelemetryPubSub(BaseMQTTPubSub):
         out_json = self.generate_payload_json(
             push_timestamp=str(int(datetime.utcnow().timestamp())),
             device_type="Collector",
-            id_="TEST",
-            deployment_id=f"AISonobuoy-Arlington-{'TEST'}",
+            id_=self.hostname,
+            deployment_id=f"AISonobuoy-Arlington-{self.hostname}",
             current_location="-90, -180",
             status="Debug",
             message_type="Event",
@@ -120,6 +122,7 @@ if __name__ == "__main__":
         telemetry_pub_topic=str(os.environ.get("TELEMETRY_TOPIC")),
         battery_capacity_file_path=str(os.environ.get("BATTERY_CAPACITY_FILE_PATH")),
         uptime_file_path=str(os.environ.get("UPTIME_FILE_PATH")),
+        hostname=str(os.environ.get("HOSTNAME")),
         mqtt_ip=os.environ.get("MQTT_IP"),
     )
     telemetry.main()
