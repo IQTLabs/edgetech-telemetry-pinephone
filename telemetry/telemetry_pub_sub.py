@@ -26,7 +26,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         battery_capacity_file_path: str,
         uptime_file_path: str,
         hostname: str,
-        debug: bool = False,
+        debug: bool = True,
         **kwargs: Any,
     ):
         """The TelemetryPubSub constructor takes a topic to publish data to and files to read
