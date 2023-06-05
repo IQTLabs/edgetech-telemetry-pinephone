@@ -28,6 +28,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         # a comma-separated string of file locations containing the values of the above variables
         telemetry_variables_file_locations: str,
         hostname: str,
+        log_file: str,
         debug: bool = True,
         **kwargs: Any,
     ):
@@ -47,6 +48,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         self.telemetry_variables_to_report = telemetry_variables_to_report.split(",")
         self.telemetry_file_locations = telemetry_variables_file_locations.split(",")
         self.hostname = hostname
+        self.log_file = log_file
 
         if debug:
             logging.getLogger().setLevel(logging.DEBUG)
@@ -98,10 +100,11 @@ class TelemetryPubSub(BaseMQTTPubSub):
 
         write_timestamp=str(int(datetime.utcnow().timestamp()))
         write_data = json.dumps(result)
-        with open(self.log_file, 'w+') as fh:
-            fh.write(
-                str(write_timestamp)  + ": "+ str(write_data) + "\n"
-            )
+        if self.log_file is not None:
+            with open(self.log_file, 'w+') as fh:
+                fh.write(
+                    str(write_timestamp)  + ": "+ str(write_data) + "\n"
+                )
 
         logging.debug(result)
 
@@ -159,6 +162,7 @@ if __name__ == "__main__":
         telemetry_variables_file_locations=telemetry_variables_file_locations,
         hostname=str(os.environ.get("HOSTNAME")),
         mqtt_ip=os.environ.get("MQTT_IP"),
+        log_file=os.environ.get("TELEMETRY_LOG_FILE"),
         debug=bool(True if os.environ.get("DEBUG") == "True" else False)
     )
     telemetry.main()
