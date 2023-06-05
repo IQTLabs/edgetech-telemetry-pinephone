@@ -8,9 +8,9 @@ from datetime import datetime
 from typing import Any
 import json
 import schedule
+import logging
 
 from base_mqtt_pub_sub import BaseMQTTPubSub
-
 
 class TelemetryPubSub(BaseMQTTPubSub):
     """This class reads a JSON file aggregated by the telemetry.py cron job running on
@@ -23,8 +23,10 @@ class TelemetryPubSub(BaseMQTTPubSub):
     def __init__(
         self: Any,
         telemetry_pub_topic: str,
-        battery_capacity_file_path: str,
-        uptime_file_path: str,
+        # a comma-separated string of the names of variables to report
+        telemetry_variables_to_report: str,
+        # a comma-separated string of file locations containing the values of the above variables
+        telemetry_variables_file_locations: str,
         hostname: str,
         debug: bool = True,
         **kwargs: Any,
@@ -42,16 +44,37 @@ class TelemetryPubSub(BaseMQTTPubSub):
         # Pass environment variables as parameters (include **kwargs) in super().__init__()
         super().__init__(**kwargs)
         self.telemetry_pub_topic = telemetry_pub_topic
-        self.battery_capacity_file_path = battery_capacity_file_path
-        self.uptime_file_path = uptime_file_path
+        self.telemetry_variables_to_report = telemetry_variables_to_report.split(",")
+        self.telemetry_file_locations = telemetry_variables_file_locations.split(",")
         self.hostname = hostname
         # include debug version
-        self.debug = debug
+        if debug:
+            logging.getLogger().setLevel(logging.DEBUG)
 
         # Connect client in constructor
         self.connect_client()
         sleep(1)
         self.publish_registration("Telemetry Module Registration")
+
+    def _apply_transformation(self: Any, variable_name: str, variable_value: str) -> str:
+        """Apply transformations to clean variable values. All values will be stripped. Known 
+        raw values extracted from pinephones with associated known variable names will undergo 
+        transformations to make them human-readable. 
+        """
+
+        return_value = variable_value.strip()
+
+        if variable_name == "uptime_total_seconds":
+            return_value = return_value.split(" ")[0]
+
+        if variable_name == "cpu_temp" or variable_name == "battery_temp":
+            return_value = return_value[0:2]
+
+        if variable_name == "mem_free":
+            return_value = str(return_value.split()[4]) + "kb"
+
+        return return_value
+
 
     def _publish_telemetry(self: Any) -> None:
         """Leverages edgetech-core functionality to publish a JSON payload to the MQTT
@@ -65,18 +88,22 @@ class TelemetryPubSub(BaseMQTTPubSub):
         # add timestamp
         result["timestamp"] = str(int(datetime.utcnow().timestamp()))
 
-        # add battery power
-        with open(self.battery_capacity_file_path, "r", encoding="utf-8") as f_pointer:
-            data = f_pointer.read()
-            result["battery_percentage"] = data.strip()
+        # add variables and values to output dictionary
+        for ptr in range(0, len(self.telemetry_variables_to_report)):
+            variable_name = self.telemetry_variables_to_report[ptr]
+            with open(self.telemetry_file_locations[ptr], "r", encoding="utf-8") as file_handle:
+                variable_value = file_handle.read()
+                variable_value = self._apply_transformation(variable_name, variable_value)
+                result[variable_name] = variable_value
 
-        # add uptime
-        with open(self.uptime_file_path, "r", encoding="utf-8") as f_pointer:
-            data = f_pointer.read()
-            result["uptime_total_seconds"] = data.split(" ")[0]
+        write_timestamp=str(int(datetime.utcnow().timestamp()))
+        write_data = json.dumps(result)
+        with open(self.log_file, 'w+') as fh:
+            fh.write(
+                str(write_timestamp)  + ": "+ str(write_data) + "\n"
+            )
 
-        if self.debug:
-            print(result)
+        logging.debug(result)
 
         # publish JSON 'result' to MQTT topic
         out_json = self.generate_payload_json(
@@ -104,7 +131,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         )
 
         # send the payload to MQTT
-        schedule.every(1).minute.do(self._publish_telemetry)
+        schedule.every(20).seconds.do(self._publish_telemetry)
 
         while True:
             try:
@@ -113,16 +140,25 @@ class TelemetryPubSub(BaseMQTTPubSub):
                 sleep(0.001)
 
             except KeyboardInterrupt as exception:
-                if self.debug:
-                    print(exception)
-
+                logging.debug(exception)
 
 if __name__ == "__main__":
+    # providing for backwards compatability with earlier versions of edgetech-telemetry-pinephone
+    telemetry_variables_to_report = os.environ.get("TELEMETRY_VARIABLES")
+    if telemetry_variables_to_report is None:
+        telemetry_variables_to_report = "battery_percentage,uptime_total_seconds"
+
+    telemetry_variables_file_locations = os.environ.get("TELEMETRY_FILE_LOCATIONS")
+    if telemetry_variables_file_locations is None:
+        telemetry_variables_file_locations = str(os.environ.get("BATTERY_CAPACITY_FILE_PATH")) + "," + str(os.environ.get("UPTIME_FILE_PATH"))
+
+    # creating the telemeter
     telemetry = TelemetryPubSub(
         telemetry_pub_topic=str(os.environ.get("TELEMETRY_TOPIC")),
-        battery_capacity_file_path=str(os.environ.get("BATTERY_CAPACITY_FILE_PATH")),
-        uptime_file_path=str(os.environ.get("UPTIME_FILE_PATH")),
+        telemetry_variables_to_report=telemetry_variables_to_report,
+        telemetry_variables_file_locations=telemetry_variables_file_locations,
         hostname=str(os.environ.get("HOSTNAME")),
         mqtt_ip=os.environ.get("MQTT_IP"),
+        debug=bool(True if os.environ.get("DEBUG") == "True" else False)
     )
     telemetry.main()
