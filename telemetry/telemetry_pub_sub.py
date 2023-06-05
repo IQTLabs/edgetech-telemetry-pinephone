@@ -47,7 +47,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         self.telemetry_variables_to_report = telemetry_variables_to_report.split(",")
         self.telemetry_file_locations = telemetry_variables_file_locations.split(",")
         self.hostname = hostname
-        # include debug version
+
         if debug:
             logging.getLogger().setLevel(logging.DEBUG)
 
