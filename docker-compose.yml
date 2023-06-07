@@ -17,8 +17,12 @@ services:
       context: ./telemetry
       dockerfile: ./Dockerfile
     volumes:
+      # Note that these volumes are for demonstration purposes only, although most 
+      # of the information required can be found in similar locations on most Linux flavors. 
       - /sys/class/power_supply/rk818-battery/capacity:/battery_capacity
       - /proc/uptime:/uptime
+      - /proc/meminfo:/meminfo
+      - /sys/class/thermal/thermal_zone0/temp:/cpu_temp
     restart: unless-stopped
     logging:
       driver: "json-file"

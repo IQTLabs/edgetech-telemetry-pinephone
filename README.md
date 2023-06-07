@@ -50,6 +50,8 @@ Current telemetry data being utilized:
 ```
 battery capacity    :   /sys/class/power_supply/rk818-battery/capacity
 uptime              :   /proc/uptime
+cpu temperature     :   /sys/class/thermal/thermal_zone0/temp
+memory free         :   /proc/meminfo
 ```
     
 
@@ -92,6 +94,11 @@ style couchdbsaver fill:#F9D308,color:#ffffff
 style filesaver fill:#F9D308,color:#ffffff
 
 ```
+
+## Environment Variables
+EdgeTech-Telemetry-Pinephone relies on two main environmenbt variables to function - 
+- `TELEMETRY_VARIABLES` provides a comma-separated list of variables names to report on the MQTT bus. 
+- `TELEMETRY_FILE_LOCATIONS` provides a one-to-one mapping to the names in `TELEMETRY_VARIABLES` detailing the filepaths where the named variables can be found internally to the container. These **must** be mounted in the `docker-compose.yml` file, as demonstrated. 
 
 ## Roadmap
 
