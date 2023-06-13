@@ -75,6 +75,9 @@ class TelemetryPubSub(BaseMQTTPubSub):
         if variable_name == "mem_free":
             return_value = str(return_value.split()[4]) + "kb"
 
+        if variable_name == "power_draw":
+            return_value = "{:.2f}".format(str(int(return_value) / 1000000))
+
         return return_value
 
 
