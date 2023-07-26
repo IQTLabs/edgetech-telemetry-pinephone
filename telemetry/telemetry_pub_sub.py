@@ -11,7 +11,7 @@ import schedule
 import logging
 
 from base_mqtt_pub_sub import BaseMQTTPubSub
-
+ 
 
 class TelemetryPubSub(BaseMQTTPubSub):
     """This class reads a JSON file aggregated by the telemetry.py cron job running on
@@ -173,8 +173,8 @@ if __name__ == "__main__":
         telemetry_variables_to_report=telemetry_variables_to_report,
         telemetry_variables_file_locations=telemetry_variables_file_locations,
         hostname=str(os.environ.get("HOSTNAME")),
-        mqtt_ip=os.environ.get("MQTT_IP"),
-        log_file=os.environ.get("TELEMETRY_LOG_FILE"),
+        mqtt_ip=str(os.environ.get("MQTT_IP")),
+        log_file=str(os.environ.get("TELEMETRY_LOG_FILE")),
         debug=bool(True if os.environ.get("DEBUG") == "True" else False),
     )
     telemetry.main()
