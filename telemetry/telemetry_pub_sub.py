@@ -12,6 +12,7 @@ import logging
 
 from base_mqtt_pub_sub import BaseMQTTPubSub
 
+
 class TelemetryPubSub(BaseMQTTPubSub):
     """This class reads a JSON file aggregated by the telemetry.py cron job running on
     the device and publishes that data to MQTT.
@@ -58,10 +59,12 @@ class TelemetryPubSub(BaseMQTTPubSub):
         sleep(1)
         self.publish_registration("Telemetry Module Registration")
 
-    def _apply_transformation(self: Any, variable_name: str, variable_value: str) -> str:
-        """Apply transformations to clean variable values. All values will be stripped. Known 
-        raw values extracted from pinephones with associated known variable names will undergo 
-        transformations to make them human-readable. 
+    def _apply_transformation(
+        self: Any, variable_name: str, variable_value: str
+    ) -> str:
+        """Apply transformations to clean variable values. All values will be stripped. Known
+        raw values extracted from pinephones with associated known variable names will undergo
+        transformations to make them human-readable.
         """
 
         return_value = variable_value.strip()
@@ -80,7 +83,6 @@ class TelemetryPubSub(BaseMQTTPubSub):
 
         return return_value
 
-
     def _publish_telemetry(self: Any) -> None:
         """Leverages edgetech-core functionality to publish a JSON payload to the MQTT
         broker on the topic specified in the class constructor after opening and reading
@@ -96,18 +98,20 @@ class TelemetryPubSub(BaseMQTTPubSub):
         # add variables and values to output dictionary
         for ptr in range(0, len(self.telemetry_variables_to_report)):
             variable_name = self.telemetry_variables_to_report[ptr]
-            with open(self.telemetry_file_locations[ptr], "r", encoding="utf-8") as file_handle:
+            with open(
+                self.telemetry_file_locations[ptr], "r", encoding="utf-8"
+            ) as file_handle:
                 variable_value = file_handle.read()
-                variable_value = self._apply_transformation(variable_name, variable_value)
+                variable_value = self._apply_transformation(
+                    variable_name, variable_value
+                )
                 result[variable_name] = variable_value
 
-        write_timestamp=str(int(datetime.utcnow().timestamp()))
+        write_timestamp = str(int(datetime.utcnow().timestamp()))
         write_data = json.dumps(result)
         if self.log_file is not None:
-            with open(self.log_file, 'w+') as fh:
-                fh.write(
-                    str(write_timestamp)  + ": "+ str(write_data) + "\n"
-                )
+            with open(self.log_file, "w+") as fh:
+                fh.write(str(write_timestamp) + ": " + str(write_data) + "\n")
 
         logging.debug(result)
 
@@ -148,6 +152,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
             except KeyboardInterrupt as exception:
                 logging.debug(exception)
 
+
 if __name__ == "__main__":
     # providing for backwards compatability with earlier versions of edgetech-telemetry-pinephone
     telemetry_variables_to_report = os.environ.get("TELEMETRY_VARIABLES")
@@ -156,7 +161,11 @@ if __name__ == "__main__":
 
     telemetry_variables_file_locations = os.environ.get("TELEMETRY_FILE_LOCATIONS")
     if telemetry_variables_file_locations is None:
-        telemetry_variables_file_locations = str(os.environ.get("BATTERY_CAPACITY_FILE_PATH")) + "," + str(os.environ.get("UPTIME_FILE_PATH"))
+        telemetry_variables_file_locations = (
+            str(os.environ.get("BATTERY_CAPACITY_FILE_PATH"))
+            + ","
+            + str(os.environ.get("UPTIME_FILE_PATH"))
+        )
 
     # creating the telemeter
     telemetry = TelemetryPubSub(
@@ -164,8 +173,8 @@ if __name__ == "__main__":
         telemetry_variables_to_report=telemetry_variables_to_report,
         telemetry_variables_file_locations=telemetry_variables_file_locations,
         hostname=str(os.environ.get("HOSTNAME")),
-        mqtt_ip=os.environ.get("MQTT_IP"),
-        log_file=os.environ.get("TELEMETRY_LOG_FILE"),
-        debug=bool(True if os.environ.get("DEBUG") == "True" else False)
+        mqtt_ip=str(os.environ.get("MQTT_IP")),
+        log_file=str(os.environ.get("TELEMETRY_LOG_FILE")),
+        debug=bool(True if os.environ.get("DEBUG") == "True" else False),
     )
     telemetry.main()
