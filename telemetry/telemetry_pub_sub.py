@@ -11,7 +11,7 @@ import schedule
 import logging
 
 from base_mqtt_pub_sub import BaseMQTTPubSub
- 
+
 
 class TelemetryPubSub(BaseMQTTPubSub):
     """This class reads a JSON file aggregated by the telemetry.py cron job running on
