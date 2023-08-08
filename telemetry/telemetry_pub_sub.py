@@ -23,7 +23,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
 
     def __init__(
         self: Any,
-        telemetry_json_topic: str,
+        telemetry_string_topic: str,
         # a comma-separated string of the names of variables to report
         telemetry_variables_to_report: str,
         # a comma-separated string of file locations containing the values of the above variables
@@ -37,7 +37,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         telemetry from.
 
         Args:
-            telemetry_json_topic (str): MQTT topic to publish the telemetry data to.
+            telemetry_string_topic (str): MQTT topic to publish the telemetry data to.
             battery_capacity_file_path (str): Path to the PinePhone battery capacity
             file (i.e. /sys/class/power_supply/rk818-battery/capacity)
             battery_capacity_file_path (str): Path to the PinePhone uptime file (i.e. /proc/uptime)
@@ -45,7 +45,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
         """
         # Pass environment variables as parameters (include **kwargs) in super().__init__()
         super().__init__(**kwargs)
-        self.telemetry_json_topic = telemetry_json_topic
+        self.telemetry_string_topic = telemetry_string_topic
         self.telemetry_variables_to_report = telemetry_variables_to_report.split(",")
         self.telemetry_file_locations = telemetry_variables_file_locations.split(",")
         self.hostname = hostname
@@ -129,7 +129,7 @@ class TelemetryPubSub(BaseMQTTPubSub):
             data_payload_type="Telemetry",
             data_payload=json.dumps(result),
         )
-        self.publish_to_topic(self.telemetry_json_topic, out_json)
+        self.publish_to_topic(self.telemetry_string_topic, out_json)
 
     def main(self: Any) -> None:
         """Main loop and function that setup the heartbeat to keep the TCP/IP
@@ -169,7 +169,7 @@ if __name__ == "__main__":
 
     # creating the telemeter
     telemetry = TelemetryPubSub(
-        telemetry_json_topic=str(os.environ.get("TELEMETRY_JSON_TOPIC")),
+        telemetry_string_topic=str(os.environ.get("TELEMETRY_STRING_TOPIC")),
         telemetry_variables_to_report=telemetry_variables_to_report,
         telemetry_variables_file_locations=telemetry_variables_file_locations,
         hostname=str(os.environ.get("HOSTNAME")),
